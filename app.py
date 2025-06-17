@@ -4,7 +4,8 @@ import os
 
 app = Flask(__name__)
 
-GROQ_API_KEY = "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"  # Replace with your actual GROQ API Key
+# Correct: Use env variable name, not the key itself
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL = "llama3-70b-8192"
 

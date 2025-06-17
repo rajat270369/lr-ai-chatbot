@@ -24,17 +24,22 @@
       if (!message) return;
 
       const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+      chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
       input.value = "";
 
-      const res = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      });
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
 
-      const data = await res.json();
-      chatbox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+        const data = await res.json();
+        chatbox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+      } catch (err) {
+        chatbox.innerHTML += `<div><b>Bot:</b> Error contacting server.</div>`;
+      }
+
       chatbox.scrollTop = chatbox.scrollHeight;
     }
   </script>
