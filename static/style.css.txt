@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #eef3f9;
+  color: #222;
+  padding: 30px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 80%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px;
+}
+
+#chatbox {
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.contact {
+  margin-top: 20px;
+  font-size: 0.9em;
+}
