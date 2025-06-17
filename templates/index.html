@@ -1,43 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>BlueBox – College AI Chatbot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>🎓 BlueBox</h1>
-    <h2>Your AI Assistant for Colleges</h2>
-    <p>Empower your institution with 24/7 instant student support. Let BlueBox handle FAQs, campus queries, admissions, and more.</p>
-
-    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-
-    <div id="chatbox"></div>
-
-    <input type="text" id="userInput" placeholder="Type a question..." autofocus />
-    <button onclick="sendMessage()">Send</button>
-
-    <div class="contact">
-      <p><strong>Interested in integrating BlueBox into your college?</strong></p>
-      <p>Email us at <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
+  <div class="chat-wrapper">
+    <div class="chat-header">
+      <h1>🎓 BlueBox</h1>
+      <p id="welcomeText">Loading...</p>
     </div>
 
-    <div class="footer">
-      &copy; 2025 BlueBox | AI Chatbots for Colleges
+    <div id="chatbox" class="chatbox"></div>
+
+    <div id="typingIndicator" class="typing hidden">
+      <img src="/static/bot-avatar.png" class="avatar" />
+      <span>BlueBox is typing...</span>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type your question..." />
+      <button onclick="sendMessage()">➤</button>
+    </div>
+
+    <div class="contact">
+      Contact us at <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a>
     </div>
   </div>
 
   <script>
+    function askName() {
+      let username = localStorage.getItem("bluebox_name");
+      if (!username) {
+        username = prompt("Hi! What’s your name?");
+        if (username) {
+          localStorage.setItem("bluebox_name", username);
+        }
+      }
+
+      const welcomeText = document.getElementById("welcomeText");
+      welcomeText.innerHTML = username
+        ? `👋 Hi, <strong>${username}</strong>! How can I help you today?`
+        : `👋 Hello! How can I help you today?`;
+    }
+
+    askName();
+
     async function sendMessage() {
       const input = document.getElementById("userInput");
       const message = input.value.trim();
       if (!message) return;
 
       const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+      const typing = document.getElementById("typingIndicator");
+
+      chatbox.innerHTML += `
+        <div class="message user">
+          <img src="/static/user-avatar.png" class="avatar" />
+          <div class="bubble"><b>You:</b> ${message}</div>
+        </div>
+      `;
       input.value = "";
+      typing.classList.remove("hidden");
 
       try {
         const res = await fetch("/chat", {
@@ -47,14 +71,26 @@
         });
 
         const data = await res.json();
-        chatbox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+        typing.classList.add("hidden");
+
+        chatbox.innerHTML += `
+          <div class="message bot">
+            <img src="/static/bot-avatar.png" class="avatar" />
+            <div class="bubble"><b>BlueBox:</b> ${data.response}</div>
+          </div>
+        `;
       } catch (err) {
-        chatbox.innerHTML += `<div><b>Bot:</b> Error contacting server.</div>`;
+        typing.classList.add("hidden");
+        chatbox.innerHTML += `
+          <div class="message bot error">
+            <img src="/static/bot-avatar.png" class="avatar" />
+            <div class="bubble">Bot: Error contacting server.</div>
+          </div>
+        `;
       }
 
       chatbox.scrollTop = chatbox.scrollHeight;
     }
   </script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </body>
 </html>
