@@ -2,49 +2,51 @@
 <html>
 <head>
   <title>BlueBox – College AI Chatbot</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="chat-wrapper">
-    <div class="chat-header">
-      <h1>🎓 BlueBox</h1>
-      <p id="welcomeText">Loading...</p>
+  <div class="container">
+    <div class="header">
+      <img src="/static/IMG_2172.png" class="logo">
+      <h1>BlueBox</h1>
     </div>
 
-    <div id="chatbox" class="chatbox"></div>
-
-    <div id="typingIndicator" class="typing hidden">
-      <img src="/static/bot-avatar.png" class="avatar" />
-      <span>BlueBox is typing...</span>
+    <div id="welcome" class="welcome">
+      <p>Hi! What’s your name?</p>
+      <input type="text" id="nameInput" placeholder="Enter your name..." />
+      <button onclick="setName()">Start Chat</button>
     </div>
 
-    <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Type your question..." />
-      <button onclick="sendMessage()">➤</button>
-    </div>
+    <div id="chatArea" class="hidden">
+      <div id="chatbox"></div>
 
-    <div class="contact">
-      Contact us at <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a>
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything..." autofocus />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+
+      <p class="contact">Contact: <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
     </div>
   </div>
 
   <script>
-    function askName() {
-      let username = localStorage.getItem("bluebox_name");
-      if (!username) {
-        username = prompt("Hi! What’s your name?");
-        if (username) {
-          localStorage.setItem("bluebox_name", username);
-        }
-      }
+    let userName = "";
 
-      const welcomeText = document.getElementById("welcomeText");
-      welcomeText.innerHTML = username
-        ? `👋 Hi, <strong>${username}</strong>! How can I help you today?`
-        : `👋 Hello! How can I help you today?`;
+    function setName() {
+      const nameField = document.getElementById("nameInput");
+      userName = nameField.value.trim();
+      if (!userName) return;
+
+      document.getElementById("welcome").classList.add("hidden");
+      document.getElementById("chatArea").classList.remove("hidden");
+
+      const chatbox = document.getElementById("chatbox");
+      chatbox.innerHTML += `
+        <div class="message bot">
+          <img src="/static/IMG_2172.png" class="avatar">
+          <div class="text">Hi ${userName}, how can I assist you today?</div>
+        </div>`;
     }
-
-    askName();
 
     async function sendMessage() {
       const input = document.getElementById("userInput");
@@ -52,16 +54,22 @@
       if (!message) return;
 
       const chatbox = document.getElementById("chatbox");
-      const typing = document.getElementById("typingIndicator");
-
       chatbox.innerHTML += `
         <div class="message user">
-          <img src="/static/user-avatar.png" class="avatar" />
-          <div class="bubble"><b>You:</b> ${message}</div>
-        </div>
-      `;
+          <img src="/static/IMG_2175.png" class="avatar">
+          <div class="text">${message}</div>
+        </div>`;
       input.value = "";
-      typing.classList.remove("hidden");
+
+      // Bot typing indicator
+      chatbox.innerHTML += `
+        <div class="message bot typing" id="typing">
+          <img src="/static/IMG_2172.png" class="avatar">
+          <div class="text dots">
+            <span>.</span><span>.</span><span>.</span>
+          </div>
+        </div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
 
       try {
         const res = await fetch("/chat", {
@@ -71,22 +79,20 @@
         });
 
         const data = await res.json();
-        typing.classList.add("hidden");
+        document.getElementById("typing").remove();
 
         chatbox.innerHTML += `
           <div class="message bot">
-            <img src="/static/bot-avatar.png" class="avatar" />
-            <div class="bubble"><b>BlueBox:</b> ${data.response}</div>
-          </div>
-        `;
+            <img src="/static/IMG_2172.png" class="avatar">
+            <div class="text">${data.response}</div>
+          </div>`;
       } catch (err) {
-        typing.classList.add("hidden");
+        document.getElementById("typing").remove();
         chatbox.innerHTML += `
-          <div class="message bot error">
-            <img src="/static/bot-avatar.png" class="avatar" />
-            <div class="bubble">Bot: Error contacting server.</div>
-          </div>
-        `;
+          <div class="message bot">
+            <img src="/static/IMG_2172.png" class="avatar">
+            <div class="text">Error contacting server.</div>
+          </div>`;
       }
 
       chatbox.scrollTop = chatbox.scrollHeight;
