@@ -1,27 +1,51 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #eef3f9;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f8fb;
   color: #222;
-  padding: 30px;
+  padding: 20px;
+  margin: 0;
 }
 
 .container {
-  max-width: 600px;
-  margin: auto;
+  max-width: 700px;
+  margin: 40px auto;
   background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-input {
-  width: 80%;
-  padding: 10px;
+h1, h2 {
+  text-align: center;
+  color: #1a73e8;
+}
+
+p {
+  line-height: 1.6;
+}
+
+input[type="text"], input[type="email"], textarea {
+  width: 100%;
+  padding: 12px;
   margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
 }
 
 button {
-  padding: 10px;
+  padding: 12px 20px;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #155ac7;
 }
 
 #chatbox {
@@ -29,11 +53,27 @@ button {
   max-height: 300px;
   overflow-y: auto;
   border: 1px solid #ccc;
-  padding: 10px;
-  background: #fafafa;
+  padding: 15px;
+  background: #fefefe;
+  border-radius: 8px;
 }
 
 .contact {
-  margin-top: 20px;
+  margin-top: 30px;
+  font-size: 0.95em;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
   font-size: 0.9em;
+  color: #888;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
 }

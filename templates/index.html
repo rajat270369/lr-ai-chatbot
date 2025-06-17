@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>BlueBox – College AI Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
     <h1>🎓 BlueBox</h1>
-    <p>Your personal college assistant. Ask anything!</p>
+    <h2>Your AI Assistant for Colleges</h2>
+    <p>Empower your institution with 24/7 instant student support. Let BlueBox handle FAQs, campus queries, admissions, and more.</p>
+
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
     <div id="chatbox"></div>
 
     <input type="text" id="userInput" placeholder="Type a question..." autofocus />
     <button onclick="sendMessage()">Send</button>
 
-    <p class="contact">Contact: <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
+    <div class="contact">
+      <p><strong>Interested in integrating BlueBox into your college?</strong></p>
+      <p>Email us at <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
+    </div>
+
+    <div class="footer">
+      &copy; 2025 BlueBox | AI Chatbots for Colleges
+    </div>
   </div>
 
   <script>

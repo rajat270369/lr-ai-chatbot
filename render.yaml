@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: bluebox-chatbot
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: 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
+        value: your-groq-api-key-here
+    plan: free
+
