@@ -24,7 +24,7 @@
       if (!message) return;
 
       const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+      chatbox.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
       input.value = "";
 
       const res = await fetch("/chat", {
