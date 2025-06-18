@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BlueBox</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <div class="chat-container">
     <header>
-      <img src="static/IMG_2172.png" class="logo" alt="BlueBox Logo">
+      <img src="/static/IMG_2172.png" class="logo" alt="BlueBox Logo">
       <h1>BlueBox</h1>
     </header>
 
@@ -42,7 +42,7 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
-      avatar.src = sender === 'user' ? 'static/IMG_2175.png' : 'static/IMG_2172.png';
+      avatar.src = sender === 'user' ? '/static/IMG_2175.png' : '/static/IMG_2172.png';
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
