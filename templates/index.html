@@ -4,16 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BlueBox</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="static/style.css" />
 </head>
 <body>
   <div class="chat-container">
     <header>
-      <img src="{{ url_for('static', filename='IMG_2172.png') }}" class="logo" alt="BlueBox Logo">
+      <img src="static/IMG_2172.png" class="logo" alt="BlueBox Logo">
       <h1>BlueBox</h1>
     </header>
 
     <div class="chat-window" id="chat-window"></div>
+
+    <!-- Typing indicator -->
+    <div id="typing-indicator" class="typing hidden">
+      <img src="static/IMG_2172.png" class="avatar" />
+      <div class="bubble">BlueBox is typing<span class="dots"></span></div>
+    </div>
 
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Type your message..." />
@@ -23,30 +29,31 @@
 
   <script>
     const chatWindow = document.getElementById('chat-window');
+    const typingIndicator = document.getElementById('typing-indicator');
 
-    async function sendMessage() {
+    function sendMessage() {
       const input = document.getElementById('user-input');
       const message = input.value.trim();
       if (!message) return;
 
       appendMessage('user', message);
       input.value = '';
+      showTyping();
 
-      // Fetch actual response from backend
-      try {
-        const response = await fetch('/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ message })
-        });
-
-        const data = await response.json();
+      fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideTyping();
         appendMessage('bot', data.reply);
-      } catch (error) {
-        appendMessage('bot', 'Sorry, something went wrong.');
-      }
+      })
+      .catch(() => {
+        hideTyping();
+        appendMessage('bot', "Sorry, something went wrong.");
+      });
     }
 
     function appendMessage(sender, text) {
@@ -55,18 +62,26 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
-      avatar.src = sender === 'user'
-        ? "{{ url_for('static', filename='IMG_2175.png') }}"
-        : "{{ url_for('static', filename='IMG_2172.png') }}";
+      avatar.src = sender === 'user' ? 'static/IMG_2175.png' : 'static/IMG_2172.png';
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      bubble.innerHTML = text.replace(/\n/g, "<br>");
+      bubble.textContent = text;
 
-      msgContainer.appendChild(bubble);
       msgContainer.appendChild(avatar);
+      msgContainer.appendChild(bubble);
       chatWindow.appendChild(msgContainer);
       chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function showTyping() {
+      typingIndicator.classList.remove('hidden');
+      chatWindow.appendChild(typingIndicator);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function hideTyping() {
+      typingIndicator.classList.add('hidden');
     }
   </script>
 </body>
