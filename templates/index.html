@@ -4,90 +4,109 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BlueBox</title>
-  <link rel="stylesheet" href="/static/style.css" />
-  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="chat-container">
+
     <header>
-      <img src="/static/IMG_2172.png" class="logo" alt="BlueBox Logo">
+      <img src="{{ url_for('static', filename='IMG_2172.png') }}" class="logo" alt="BlueBox Logo">
       <h1>BlueBox</h1>
-      <button id="theme-toggle">🌙</button>
+      <div class="toggle-container">
+        <button id="dark-mode-toggle">🌙</button>
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="ta">Tamil</option>
+          <option value="bn">Bengali</option>
+        </select>
+      </div>
     </header>
 
-    <div id="preload-questions">
-      <p>Popular Topics:</p>
-      <button onclick="sendPreloaded('What is the admission process?')">Admission</button>
-      <button onclick="sendPreloaded('Best private colleges in India')">Top Colleges</button>
-      <button onclick="sendPreloaded('Hostel facilities available?')">Hostels</button>
-      <button onclick="sendPreloaded('What are the fees?')">Fees</button>
-      <button onclick="sendPreloaded('What scholarships are available?')">Scholarships</button>
+    <div class="preloader-questions">
+      <button onclick="sendPreloaded('What is the admission process?')">Admission Process</button>
+      <button onclick="sendPreloaded('List of best private colleges in India')">Best Colleges</button>
+      <button onclick="sendPreloaded('What are hostel facilities like?')">Hostel Facilities</button>
+      <button onclick="sendPreloaded('What are the average fees?')">Fees</button>
+      <button onclick="sendPreloaded('Are there scholarships available?')">Scholarships</button>
     </div>
 
     <div class="chat-window" id="chat-window"></div>
 
-    <div class="typing-indicator" id="typing-indicator" style="display: none;">BlueBox is typing...</div>
-
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
-      <button onclick="startVoiceInput()">🎤</button>
-      <button onclick="resetChat()">Reset</button>
+      <button id="voice-input" title="Voice Input">
+        <img src="{{ url_for('static', filename='google-voice-icon.png') }}" alt="Voice" width="24" height="24">
+      </button>
+      <button onclick="resetChat()" class="reset-btn">🔄</button>
     </div>
 
+    <form class="contact-form">
+      <h3>Contact Us</h3>
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Your Message" required></textarea>
+      <button type="submit">Send</button>
+    </form>
+
     <footer>
-      <p>Contact us: <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
-      <div id="google_translate_element"></div>
+      <p>© 2025 BlueBox | Contact: <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
     </footer>
   </div>
 
   <script>
     const chatWindow = document.getElementById('chat-window');
-    const typingIndicator = document.getElementById('typing-indicator');
-
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
-    }
+    let speechSynthesisUtterance = null;
 
     function appendMessage(sender, text) {
-      const container = document.createElement('div');
-      container.classList.add('message', sender);
+      const msgContainer = document.createElement('div');
+      msgContainer.classList.add('message', sender);
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
       avatar.src = sender === 'user' ? '/static/IMG_2175.png' : '/static/IMG_2172.png';
 
       const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.innerText = text;
-
-      container.appendChild(avatar);
-      container.appendChild(bubble);
-      chatWindow.appendChild(container);
+      bubble.className = 'bubble typing';
+      msgContainer.appendChild(avatar);
+      msgContainer.appendChild(bubble);
+      chatWindow.appendChild(msgContainer);
       chatWindow.scrollTop = chatWindow.scrollHeight;
 
-      if (sender === 'bot') {
-        speak(text);
-      }
+      setTimeout(() => {
+        bubble.textContent = text;
+        bubble.classList.remove('typing');
+        if (sender === 'bot') speakText(text);
+      }, 500);
     }
 
-    async function sendMessage() {
+    function stopSpeaking() {
+      if (speechSynthesis.speaking) speechSynthesis.cancel();
+    }
+
+    function speakText(text) {
+      stopSpeaking();
+      speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(speechSynthesisUtterance);
+    }
+
+    function sendMessage() {
+      stopSpeaking();
       const input = document.getElementById('user-input');
       const message = input.value.trim();
       if (!message) return;
 
       appendMessage('user', message);
       input.value = '';
-      typingIndicator.style.display = 'block';
 
-      const response = await fetch('/chat', {
+      fetch('/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
-      const data = await response.json();
-      typingIndicator.style.display = 'none';
-      appendMessage('bot', data.reply);
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message, language: document.getElementById('language-select').value })
+      })
+      .then(res => res.json())
+      .then(data => appendMessage('bot', data.reply));
     }
 
     function sendPreloaded(text) {
@@ -99,28 +118,11 @@
       chatWindow.innerHTML = '';
     }
 
-    function startVoiceInput() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-IN';
-      recognition.onresult = event => {
-        document.getElementById('user-input').value = event.results[0][0].transcript;
-        sendMessage();
-      };
-      recognition.start();
-    }
-
-    function speak(text) {
-      const msg = new SpeechSynthesisUtterance(text);
-      msg.lang = 'en-IN';
-      speechSynthesis.speak(msg);
-    }
-
-    // Dark Mode Toggle
-    const toggleBtn = document.getElementById('theme-toggle');
-    toggleBtn.onclick = () => {
-      document.body.classList.toggle('dark');
-      toggleBtn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-    };
+    document.addEventListener("click", stopSpeaking);
+    document.getElementById("user-input").addEventListener("keydown", stopSpeaking);
+    document.getElementById("dark-mode-toggle").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
   </script>
 </body>
 </html>
