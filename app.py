@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Correct way to get your key from environment
+# Load Groq API Key from environment variable
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -23,8 +23,16 @@ def chat():
 
     payload = {
         "model": "llama3-70b-8192",
+        "max_tokens": 500,
         "messages": [
-            {"role": "system", "content": "You are BlueBox, a helpful assistant designed to answer college and school related questions."},
+            {
+                "role": "system",
+                "content": (
+                    "You are BlueBox, a helpful and concise assistant built for students. "
+                    "Keep responses short and to the point. "
+                    "When asked for multiple items (like colleges, steps, tips, etc.), always format your answer as a clean, numbered list."
+                )
+            },
             {"role": "user", "content": user_input}
         ]
     }
