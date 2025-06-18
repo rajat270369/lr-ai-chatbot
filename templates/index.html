@@ -61,7 +61,7 @@
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      bubble.textContent = text;
+      bubble.innerHTML = text.replace(/\n/g, "<br>");
 
       msgContainer.appendChild(bubble);
       msgContainer.appendChild(avatar);
