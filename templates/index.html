@@ -9,7 +9,7 @@
 <body>
   <div class="chat-container">
     <header>
-      <img src="/static/IMG_2172.png" class="logo" alt="BlueBox Logo">
+      <img src="{{ url_for('static', filename='IMG_2172.png') }}" class="logo" alt="BlueBox Logo">
       <h1>BlueBox</h1>
     </header>
 
@@ -24,16 +24,29 @@
   <script>
     const chatWindow = document.getElementById('chat-window');
 
-    function sendMessage() {
+    async function sendMessage() {
       const input = document.getElementById('user-input');
       const message = input.value.trim();
       if (!message) return;
 
       appendMessage('user', message);
       input.value = '';
-      setTimeout(() => {
-        appendMessage('bot', "This is a placeholder response from BlueBox.");
-      }, 800);
+
+      // Fetch actual response from backend
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        appendMessage('bot', data.reply);
+      } catch (error) {
+        appendMessage('bot', 'Sorry, something went wrong.');
+      }
     }
 
     function appendMessage(sender, text) {
@@ -42,14 +55,16 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
-      avatar.src = sender === 'user' ? '/static/IMG_2175.png' : '/static/IMG_2172.png';
+      avatar.src = sender === 'user'
+        ? "{{ url_for('static', filename='IMG_2175.png') }}"
+        : "{{ url_for('static', filename='IMG_2172.png') }}";
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.textContent = text;
 
-      msgContainer.appendChild(avatar);
       msgContainer.appendChild(bubble);
+      msgContainer.appendChild(avatar);
       chatWindow.appendChild(msgContainer);
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
