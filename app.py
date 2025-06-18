@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+# Load Groq API Key from environment variable
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -22,34 +23,17 @@ def chat():
 
     payload = {
         "model": "llama3-70b-8192",
-        "max_tokens": 600,
+        "max_tokens": 500,
         "messages": [
             {
                 "role": "system",
                 "content": (
-                    "You are BlueBox, a concise and helpful assistant for students. "
-                    "Keep replies short and clear. When asked about multiple items (like steps, options, or colleges), "
-                    "always format the answer as a numbered list."
+                    "You are BlueBox, a helpful and concise assistant built for students. "
+                    "Keep responses short and to the point. "
+                    "When asked about multiple things like colleges, facilities, or fees, format the reply in a clean numbered list."
                 )
             },
-            {
-                "role": "user",
-                "content": "Can you give me 5 tips to prepare for exams?"
-            },
-            {
-                "role": "assistant",
-                "content": (
-                    "1. Make a study schedule and stick to it.\n"
-                    "2. Focus on understanding concepts, not just memorizing.\n"
-                    "3. Take regular breaks to avoid burnout.\n"
-                    "4. Practice with past papers and mock tests.\n"
-                    "5. Get enough sleep before the exam day."
-                )
-            },
-            {
-                "role": "user",
-                "content": user_input
-            }
+            {"role": "user", "content": user_input}
         ]
     }
 
@@ -61,6 +45,18 @@ def chat():
         return jsonify({'reply': reply})
     except requests.exceptions.RequestException as e:
         return jsonify({'reply': f"Error: {str(e)}"})
+
+@app.route('/contact', methods=['POST'])
+def contact():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    query = data.get('query')
+
+    # Log contact submission or integrate with analytics/email if needed
+    print(f"[Contact] Name: {name}, Email: {email}, Message: {query}")
+
+    return jsonify({"status": "success"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)

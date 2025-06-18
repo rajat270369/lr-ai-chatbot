@@ -13,23 +13,57 @@
       <h1>BlueBox</h1>
     </header>
 
-    <div class="chat-window" id="chat-window"></div>
-
-    <!-- Typing indicator -->
-    <div id="typing-indicator" class="typing hidden">
-      <img src="static/IMG_2172.png" class="avatar" />
-      <div class="bubble">BlueBox is typing<span class="dots"></span></div>
+    <div id="preloader" class="preloader">
+      <p>Popular questions:</p>
+      <button onclick="sendPreloaded('What is the admission process?')">Admission Process</button>
+      <button onclick="sendPreloaded('Best private colleges in India?')">Best Private Colleges</button>
+      <button onclick="sendPreloaded('Are hostel facilities available?')">Hostel Facilities</button>
+      <button onclick="sendPreloaded('What are the fees?')">Fees</button>
+      <button onclick="sendPreloaded('Are there any scholarships?')">Scholarships</button>
     </div>
+
+    <div class="chat-window" id="chat-window"></div>
+    <div id="typing-indicator" class="typing">BlueBox is typing...</div>
 
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
+      <button onclick="resetChat()" class="reset-btn">Reset</button>
+      <button onclick="startVoiceInput()" class="mic-btn">🎤</button>
     </div>
+
+    <div class="faq-section">
+      <h3>FAQs</h3>
+      <ul>
+        <li onclick="sendPreloaded('How to apply for admission?')">How to apply for admission?</li>
+        <li onclick="sendPreloaded('What documents are required?')">What documents are required?</li>
+        <li onclick="sendPreloaded('Is there a hostel for girls?')">Is there a hostel for girls?</li>
+      </ul>
+    </div>
+
+    <div class="contact-section">
+      <h3>Contact Us</h3>
+      <form id="contact-form">
+        <input type="text" name="name" placeholder="Your Name" required />
+        <input type="email" name="email" placeholder="Your Email" required />
+        <textarea name="query" placeholder="Your Message..." required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <footer>
+      <p>Contact us at: <a href="mailto:bluebox2703@gmail.com">bluebox2703@gmail.com</a></p>
+    </footer>
   </div>
 
   <script>
     const chatWindow = document.getElementById('chat-window');
     const typingIndicator = document.getElementById('typing-indicator');
+
+    function sendPreloaded(text) {
+      document.getElementById('user-input').value = text;
+      sendMessage();
+    }
 
     function sendMessage() {
       const input = document.getElementById('user-input');
@@ -38,21 +72,17 @@
 
       appendMessage('user', message);
       input.value = '';
-      showTyping();
+      typingIndicator.style.display = 'block';
 
       fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ message })
       })
       .then(res => res.json())
       .then(data => {
-        hideTyping();
+        typingIndicator.style.display = 'none';
         appendMessage('bot', data.reply);
-      })
-      .catch(() => {
-        hideTyping();
-        appendMessage('bot', "Sorry, something went wrong.");
       });
     }
 
@@ -66,7 +96,7 @@
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      bubble.textContent = text;
+      bubble.innerHTML = text.replace(/\n/g, "<br>");
 
       msgContainer.appendChild(avatar);
       msgContainer.appendChild(bubble);
@@ -74,15 +104,36 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    function showTyping() {
-      typingIndicator.classList.remove('hidden');
-      chatWindow.appendChild(typingIndicator);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+    function resetChat() {
+      chatWindow.innerHTML = '';
     }
 
-    function hideTyping() {
-      typingIndicator.classList.add('hidden');
+    function startVoiceInput() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('user-input').value = transcript;
+        sendMessage();
+      };
+      recognition.start();
     }
+
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => data[key] = value);
+
+      fetch('/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(() => {
+        alert('Thank you for contacting us!');
+        this.reset();
+      });
+    });
   </script>
 </body>
 </html>
