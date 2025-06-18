@@ -4,7 +4,8 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-GROQ_API_KEY = os.environ.get("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")
+# Correct way to get your key from environment
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 @app.route('/')
