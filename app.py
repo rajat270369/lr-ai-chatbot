@@ -22,25 +22,34 @@ def chat():
 
     payload = {
         "model": "llama3-70b-8192",
-        "max_tokens": 500,
+        "max_tokens": 600,
         "messages": [
             {
                 "role": "system",
                 "content": (
-                    "You are BlueBox, a helpful and concise assistant built for students. "
-                    "Keep responses short and to the point. When the user asks about multiple items or categories, "
-                    "format the answer as a clean, numbered list.\n\n"
-                    "Example:\n"
-                    "User: What are some popular engineering branches?\n"
-                    "Assistant:\n"
-                    "1. Computer Science\n"
-                    "2. Mechanical Engineering\n"
-                    "3. Electrical Engineering\n"
-                    "4. Civil Engineering\n"
-                    "5. Chemical Engineering\n"
+                    "You are BlueBox, a concise and helpful assistant for students. "
+                    "Keep replies short and clear. When asked about multiple items (like steps, options, or colleges), "
+                    "always format the answer as a numbered list."
                 )
             },
-            {"role": "user", "content": user_input}
+            {
+                "role": "user",
+                "content": "Can you give me 5 tips to prepare for exams?"
+            },
+            {
+                "role": "assistant",
+                "content": (
+                    "1. Make a study schedule and stick to it.\n"
+                    "2. Focus on understanding concepts, not just memorizing.\n"
+                    "3. Take regular breaks to avoid burnout.\n"
+                    "4. Practice with past papers and mock tests.\n"
+                    "5. Get enough sleep before the exam day."
+                )
+            },
+            {
+                "role": "user",
+                "content": user_input
+            }
         ]
     }
 
