@@ -1,13 +1,11 @@
-from flask import Flask, render_template, request, jsonify
 import os
 import requests
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Fetch your Groq API key from Render environment variable
-GROQ_API_KEY = os.getenv("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")
+GROQ_API_KEY = os.environ.get("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")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-MODEL = "llama3-70b-8192"
 
 @app.route('/')
 def home():
@@ -22,21 +20,21 @@ def chat():
         "Content-Type": "application/json"
     }
 
-    data = {
-        "model": MODEL,
+    payload = {
+        "model": "llama3-70b-8192",
         "messages": [
-            {"role": "system", "content": "You are a helpful college assistant named BlueBox."},
+            {"role": "system", "content": "You are BlueBox, a helpful assistant designed to answer college and school related questions."},
             {"role": "user", "content": user_input}
-        ],
-        "temperature": 0.7
+        ]
     }
 
     try:
-        response = requests.post(GROQ_API_URL, headers=headers, json=data)
+        response = requests.post(GROQ_API_URL, headers=headers, json=payload)
         response.raise_for_status()
-        reply = response.json()["choices"][0]["message"]["content"]
+        data = response.json()
+        reply = data['choices'][0]['message']['content']
         return jsonify({'reply': reply})
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         return jsonify({'reply': f"Error: {str(e)}"})
 
 if __name__ == '__main__':
