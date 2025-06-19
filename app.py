@@ -26,7 +26,7 @@ def chat():
             {
                 "role": "system",
                 "content": (
-                    "You are BlueBox, a helpful and concise assistant for students. "
+                    "You are LR.AI, a helpful and concise assistant for students. "
                     "Keep replies short and structured. If asked about multiple items or steps, respond with a clean, numbered list."
                 )
             },
