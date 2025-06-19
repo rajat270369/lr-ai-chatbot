@@ -10,7 +10,7 @@
   <div class="chat-container">
 
     <header>
-      <img src="static/lr-ai-logo.png" class="logo" alt="LR.AI Logo">
+      <img src="{{ url_for('static', filename='lr-ai-logo.png') }}" class="logo" alt="LR.AI Logo">
       <h1>LR.AI</h1>
       <div class="toggle-container">
         <button id="dark-mode-toggle">🌙</button>
@@ -23,13 +23,7 @@
       </div>
     </header>
 
-    <div class="preloader-questions">
-      <button onclick="sendPreloaded('What is the admission process?')">Admission Process</button>
-      <button onclick="sendPreloaded('List of best private colleges in India')">Best Colleges</button>
-      <button onclick="sendPreloaded('What are hostel facilities like?')">Hostel Facilities</button>
-      <button onclick="sendPreloaded('What are the average fees?')">Fees</button>
-      <button onclick="sendPreloaded('Are there scholarships available?')">Scholarships</button>
-    </div>
+    <!-- Removed college-specific suggestions -->
 
     <div class="chat-window" id="chat-window"></div>
 
@@ -107,11 +101,6 @@
       })
       .then(res => res.json())
       .then(data => appendMessage('bot', data.reply));
-    }
-
-    function sendPreloaded(text) {
-      document.getElementById('user-input').value = text;
-      sendMessage();
     }
 
     function resetChat() {
