@@ -160,10 +160,25 @@ footer {
 
 .dark .bubble {
   background-color: #4b5563;
+  color: #f9fafb; /* Light text in bubbles */
 }
 
 .dark .message.user .bubble {
   background-color: #10b981;
+  color: #fff;
+}
+
+/* Contact form fixes */
+.dark .contact-form input,
+.dark .contact-form textarea {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
+}
+
+.dark .contact-form input::placeholder,
+.dark .contact-form textarea::placeholder {
+  color: #94a3b8;
 }
 
 /* Animations */
