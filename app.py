@@ -4,15 +4,14 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Load Groq API Key from environment variables
+# Load Groq API Key
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Print key status (not the key itself) for debugging
 if GROQ_API_KEY:
-    print("✅ Groq API Key loaded successfully.")
+    print("✅ Groq API Key loaded.")
 else:
-    print("❌ Groq API Key NOT FOUND. Please set GROQ_API_KEY in environment variables.")
+    print("❌ Groq API Key not found.")
 
 @app.route('/')
 def home():

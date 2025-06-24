@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LR.AI</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="chat-container">
@@ -23,15 +24,13 @@
       </div>
     </header>
 
-    <!-- Removed college-specific suggestions -->
-
     <div class="chat-window" id="chat-window"></div>
 
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
+      <button onclick="sendMessage()">🚀 Send</button>
       <button id="voice-input" title="Voice Input">
-        <img src="{{ url_for('static', filename='google-voice-icon.png') }}" alt="Voice" width="24" height="24">
+        <img src="{{ url_for('static', filename='google-voice-icon.png') }}" alt="Voice" width="24" height="24" style="filter: drop-shadow(0 0 2px #38bdf8);" />
       </button>
       <button onclick="resetChat()" class="reset-btn">🔄</button>
     </div>
