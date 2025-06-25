@@ -21,25 +21,42 @@ def home():
 def chat():
     user_input = request.json.get('message')
     language = request.json.get('language', 'en')
+    template = request.json.get('template', 'general')
 
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    payload = {
-        "model": "llama3-70b-8192",
-        "max_tokens": 500,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                   "You are LR.AI, an assistant for businesses. "
-                   "Keep responses short, clear, and easy to scan. "
-                   "Use a maximum of 3 to 5 bullet points or lines unless the user asks for more. "
-                   "Avoid long paragraphs. Use short sentences. "
-                   "Add spacing between points. Always respond in this language: " + language
-                     )
+    industry_prompts = {
+    "college": "You are an admissions assistant for a college. Help with courses, fees, scholarships, and campus life.",
+    "clinic": "You are a clinic receptionist assistant. Help with appointments, services, timings, and patient queries.",
+    "hotel": "You assist hotel guests. Help with room availability, pricing, booking, and facilities.",
+    "ecommerce": "You are a product assistant for an online store. Help with product suggestions, order tracking, and returns.",
+    "salon": "You are a salon booking assistant. Help clients pick styles, book slots, and view prices.",
+    "consultant": "You are a consultant lead bot. Ask qualifying questions and explain services clearly.",
+    "fitness": "You are a gym assistant. Suggest workout plans, book trainer sessions, and answer fitness questions.",
+    "real_estate": "You are a property assistant. Help users find houses based on location, price, and type.",
+    "therapist": "You are a calm mental health assistant. Help users understand therapy options and book sessions."
+}
+
+industry_prompt = industry_prompts.get(template, "You are a helpful and polite AI assistant for all types of businesses.")
+
+payload = {
+    "model": "llama3-70b-8192",
+    "max_tokens": 500,
+    "messages": [
+        {
+            "role": "system",
+            "content": (
+                f"{industry_prompt} "
+                "Keep responses short, use bullet points if listing, and keep them clean and readable. "
+                f"Reply in this language: {language}."
+            )
+        },
+        {"role": "user", "content": user_input}
+    ]
+}
 
             },
             {"role": "user", "content": user_input}
