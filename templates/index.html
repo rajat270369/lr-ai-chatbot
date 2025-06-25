@@ -114,21 +114,32 @@
       avatar.className = 'avatar';
 
       if (sender === 'user') {
-        avatar.src = '/static/IMG_2175.png';
+      const userIcons = {
+      college: '/static/icons/user-college.png',
+      clinic: '/static/icons/user-clinic.png',
+      hotel: '/static/icons/user-hotel.png',
+      ecommerce: '/static/icons/user-ecommerce.png',
+      salon: '/static/icons/user-salon.png',
+      consultant: '/static/icons/user-consultant.png',
+      fitness: '/static/icons/user-fitness.png',
+      real_estate: '/static/icons/user-realestate.png',
+      therapist: '/static/icons/user-therapist.png'
+      };
+      avatar.src = userIcons[currentTemplate] || '/static/IMG_2175.png';
       } else {
-        const iconMap = {
-          college: '/static/icons/college.png',
-          clinic: '/static/icons/clinic.png',
-          hotel: '/static/icons/hotel.png',
-          ecommerce: '/static/icons/ecommerce.png',
-          salon: '/static/icons/salon.png',
-          consultant: '/static/icons/consultant.png',
-          fitness: '/static/icons/fitness.png',
-          real_estate: '/static/icons/real_estate.png',
-          therapist: '/static/icons/therapist.png'
-        };
-        avatar.src = iconMap[currentTemplate] || '/static/lr-ai-logo.png';
-      }
+     const iconMap = {
+     college: '/static/icons/college.png',
+     clinic: '/static/icons/clinic.png',
+     hotel: '/static/icons/hotel.png',
+     ecommerce: '/static/icons/ecommerce.png',
+     salon: '/static/icons/salon.png',
+     consultant: '/static/icons/consultant.png',
+     fitness: '/static/icons/fitness.png',
+     real_estate: '/static/icons/real_estate.png',
+     therapist: '/static/icons/therapist.png'
+     };
+  avatar.src = iconMap[currentTemplate] || '/static/lr-ai-logo.png';
+}
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble typing';
@@ -148,13 +159,36 @@
     function stopSpeaking() {
       if (speechSynthesis.speaking) speechSynthesis.cancel();
     }
+    let availableVoices = [];
+
+    window.speechSynthesis.onvoiceschanged = () => {
+    availableVoices = speechSynthesis.getVoices();
+    };
 
     function speakText(text) {
-      stopSpeaking();
-      if (!speechEnabled) return;
-      speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
-      speechSynthesis.speak(speechSynthesisUtterance);
-    }
+  stopSpeaking();
+  if (!speechEnabled) return;
+
+  speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+
+  const voiceMap = {
+    college: 'en-US-GuyNeural',
+    clinic: 'en-GB-George',
+    hotel: 'en-US-ChristopherNeural',
+    ecommerce: 'en-US-DavisNeural',
+    salon: 'en-US-JennyNeural',        // Female
+    consultant: 'en-US-AndrewNeural',
+    fitness: 'en-AU-WilliamNeural',
+    real_estate: 'en-IN-PrabhatNeural',
+    therapist: 'en-GB-LibbyNeural'      // Female
+  };
+
+  const preferred = voiceMap[currentTemplate] || '';
+  const matched = availableVoices.find(v => v.name.includes(preferred));
+  if (matched) speechSynthesisUtterance.voice = matched;
+
+  speechSynthesis.speak(speechSynthesisUtterance);
+}
 
     function sendMessage() {
       stopSpeaking();
