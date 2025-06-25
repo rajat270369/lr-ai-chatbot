@@ -83,25 +83,7 @@
       speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
       speechSynthesis.speak(speechSynthesisUtterance);
     }
-
-    function sendMessage() {
-      stopSpeaking();
-      const input = document.getElementById('user-input');
-      const message = input.value.trim();
-      if (!message) return;
-
-      appendMessage('user', message);
-      input.value = '';
-
-      fetch('/chat', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ message, language: document.getElementById('language-select').value })
-      })
-      .then(res => res.json())
-      .then(data => appendMessage('bot', data.reply));
-    }
-
+    
     function resetChat() {
       chatWindow.innerHTML = '';
     }
@@ -149,57 +131,57 @@ function sendMessage() {
     <div class="industry-card">
       <h3>🎓 College Admissions</h3>
       <p>Answers questions about fees, courses, scholarships & more.</p>
-      <button onclick="setTemplateAndScroll('Collage Admissions')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('college')">Try Demo</button>
 
     </div>
 
     <div class="industry-card">
       <h3>🦷 Dental Clinics</h3>
       <p>Books appointments, gives oral care tips, handles patient FAQs.</p>
-      <button onclick="setTemplateAndScroll('Dental Clinics')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('clinic')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>🛏️ Hotels & Resorts</h3>
       <p>Helps guests check room availability, amenities, and booking.</p>
-      <button onclick="setTemplateAndScroll('Hotels and Resorts')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('hotel')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>🏋️ Gyms & Trainers</h3>
       <p>Suggests workouts, books training slots, answers fitness queries.</p>
-      <button onclick="setTemplateAndScroll('Gym & Trainers')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('fitness')">Try Demo</button>
 
     </div>
 
     <div class="industry-card">
       <h3>💼 Consultants</h3>
       <p>Qualifies leads, explains services, and collects client info.</p>
-      <button onclick="setTemplateAndScroll('Consultants')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('consultant')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>🛒 Ecommerce</h3>
       <p>Recommends products, tracks orders, answers shipping questions.</p>
-      <button onclick="setTemplateAndScroll('Ecommerce')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('ecommerce')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>🧘 Therapists</h3>
       <p>Guides users through check-ins, therapy types, and bookings.</p>
-      <button onclick="setTemplateAndScroll('Therapists')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('therapist')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>🏠 Real Estate</h3>
       <p>Shows listings by location, budget, or property type.</p>
-      <button onclick="setTemplateAndScroll('Real Estate')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('real_estate')">Try Demo</button>
     </div>
 
     <div class="industry-card">
       <h3>✂️ Salons</h3>
       <p>Books haircuts, suggests styles, answers pricing questions.</p>
-      <button onclick="setTemplateAndScroll('Salons')">Try Demo</button>
+      <button onclick="setTemplateAndScroll('salon')">Try Demo</button>
     </div>
 
   </div>
