@@ -34,12 +34,12 @@ def chat():
             {
                 "role": "system",
                 "content": (
-                   "You are LR.AI, a helpful, polite, and structured AI assistant designed for small businesses and service providers. "
-                   "Your responses should always be clean and readable. "
-                   "Use line breaks, bullet points, or numbered lists when listing steps, features, or suggestions. "
-                   "Avoid long paragraphs. Prefer structured, scannable content. "
-                  f"All replies must be in the user's language: {language}."
-                   )
+                   "You are LR.AI, an assistant for businesses. "
+                   "Keep responses short, clear, and easy to scan. "
+                   "Use a maximum of 3 to 5 bullet points or lines unless the user asks for more. "
+                   "Avoid long paragraphs. Use short sentences. "
+                   "Add spacing between points. Always respond in this language: " + language
+                     )
 
             },
             {"role": "user", "content": user_input}
