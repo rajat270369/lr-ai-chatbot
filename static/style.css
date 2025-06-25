@@ -159,8 +159,8 @@ footer {
 }
 
 .dark .bubble {
-  background-color: #4b5563;
-  color: #f9fafb; /* Light text in bubbles */
+  background-color: #f5f5f5;  /* light bubble */
+  color: #111;                /* black text */
 }
 
 .dark .message.user .bubble {
