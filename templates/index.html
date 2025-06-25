@@ -49,6 +49,7 @@
   </div>
 
   <script>
+    let speechEnabled = true;
     const chatWindow = document.getElementById('chat-window');
     let speechSynthesisUtterance = null;
 
@@ -58,7 +59,24 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
-      avatar.src = sender === 'user' ? '/static/IMG_2175.png' : '/static/lr-ai-logo.png';
+      if (sender === 'user') {
+      avatar.src = '/static/IMG_2175.png';
+      } else {
+      const iconMap = {
+    college: '/static/icons/college.png',
+    clinic: '/static/icons/clinic.png',
+    hotel: '/static/icons/hotel.png',
+    ecommerce: '/static/icons/ecommerce.png',
+    salon: '/static/icons/salon.png',
+    consultant: '/static/icons/consultant.png',
+    fitness: '/static/icons/fitness.png',
+    real_estate: '/static/icons/real_estate.png',
+    therapist: '/static/icons/therapist.png'
+    };
+    const current = window.currentTemplate || "general";
+    avatar.src = iconMap[current] || '/static/lr-ai-logo.png';
+    }
+
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble typing';
@@ -80,6 +98,7 @@
 
     function speakText(text) {
       stopSpeaking();
+      if (!speechEnabled) return;
       speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
       speechSynthesis.speak(speechSynthesisUtterance);
     }
@@ -90,7 +109,11 @@
 
     document.addEventListener("click", stopSpeaking);
     document.getElementById("user-input").addEventListener("keydown", stopSpeaking);
-    document.getElementById("dark-mode-toggle").addEventListener("click", () => {
+    document.getElementById("dark-mode-toggle").addEventListener("click", () => {<button id="tts-toggle" title="Toggle Voice">🔈</button>
+    document.getElementById("tts-toggle").addEventListener("click", () => {
+   speechEnabled = !speechEnabled;
+    document.getElementById("tts-toggle").textContent = speechEnabled ? "🔈" : "🔇";
+    });
       document.body.classList.toggle("dark");
     });
     // 1. Store selected chatbot template
@@ -98,7 +121,20 @@ function setTemplateAndScroll(template) {
   window.currentTemplate = template;
   document.getElementById("user-input").focus();
   document.getElementById("chat-window").innerHTML = '';
-  appendMessage("bot", "Hi! I'm your assistant. How can I help you today?");
+
+  const greetings = {
+    college: "Hi! I'm your college admissions assistant. How can I help you?",
+    clinic: "Hi! I'm your dental clinic assistant. How can I help you today?",
+    hotel: "Hello! I'm your hotel assistant. Need help with bookings?",
+    ecommerce: "Hi there! I'm your shopping assistant. What are you looking for?",
+    salon: "Hello! I'm your salon assistant. Ready for a makeover?",
+    consultant: "Hi! I'm your consulting assistant. How can I guide you?",
+    fitness: "Hey! I'm your gym assistant. Want to plan a workout?",
+    real_estate: "Hello! I'm your property assistant. Looking to buy or rent?",
+    therapist: "Hi! I'm your mental health assistant. How are you feeling today?"
+  };
+
+  appendMessage("bot", greetings[template] || "Hi! I'm your assistant. How can I help?");
 }
 
 // 2. Add template to the message request
