@@ -187,10 +187,8 @@ button:hover, .reset-btn:hover {
 .input-area {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 10px;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .input-area input {
@@ -291,26 +289,29 @@ footer {
 
 @media (max-width: 600px) {
   .input-area {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .input-area input {
     width: 100%;
-    margin-bottom: 8px;
+    font-size: 1.1em;
+    padding: 14px;
   }
 
   .input-area button {
-    flex: 1 1 auto;
-    margin-bottom: 8px;
+    padding: 6px 10px;
+    font-size: 0.9em;
+    flex: none;
   }
 
-  .toggle-container {
-    flex-wrap: wrap;
-    gap: 6px;
+  #voice-input img {
+    width: 20px;
+    height: 20px;
   }
 
-  .industries-grid {
-    grid-template-columns: 1fr;
+  .reset-btn {
+    font-size: 16px;
+    padding: 0 8px;
   }
 }
