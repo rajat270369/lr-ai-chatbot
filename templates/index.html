@@ -14,7 +14,8 @@
       <img src="{{ url_for('static', filename='lr-ai-logo.png') }}" class="logo" alt="LR.AI Logo">
       <h1>LR.AI</h1>
       <div class="toggle-container">
-        <button id="dark-mode-toggle">🌙</button>
+        <button id="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+        <button id="tts-toggle" title="Toggle Voice">🔈</button>
         <select id="language-select">
           <option value="en">English</option>
           <option value="hi">Hindi</option>
@@ -48,10 +49,62 @@
     </footer>
   </div>
 
+  <section class="industries-section">
+    <h2>Industries We Serve</h2>
+    <div class="industries-grid">
+      <div class="industry-card">
+        <h3>🎓 College Admissions</h3>
+        <p>Answers questions about fees, courses, scholarships & more.</p>
+        <button onclick="setTemplateAndScroll('college')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🦷 Dental Clinics</h3>
+        <p>Books appointments, gives oral care tips, handles patient FAQs.</p>
+        <button onclick="setTemplateAndScroll('clinic')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🛏️ Hotels & Resorts</h3>
+        <p>Helps guests check room availability, amenities, and booking.</p>
+        <button onclick="setTemplateAndScroll('hotel')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🏋️ Gyms & Trainers</h3>
+        <p>Suggests workouts, books training slots, answers fitness queries.</p>
+        <button onclick="setTemplateAndScroll('fitness')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>💼 Consultants</h3>
+        <p>Qualifies leads, explains services, and collects client info.</p>
+        <button onclick="setTemplateAndScroll('consultant')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🛒 Ecommerce</h3>
+        <p>Recommends products, tracks orders, answers shipping questions.</p>
+        <button onclick="setTemplateAndScroll('ecommerce')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🧘 Therapists</h3>
+        <p>Guides users through check-ins, therapy types, and bookings.</p>
+        <button onclick="setTemplateAndScroll('therapist')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>🏠 Real Estate</h3>
+        <p>Shows listings by location, budget, or property type.</p>
+        <button onclick="setTemplateAndScroll('real_estate')">Try Demo</button>
+      </div>
+      <div class="industry-card">
+        <h3>✂️ Salons</h3>
+        <p>Books haircuts, suggests styles, answers pricing questions.</p>
+        <button onclick="setTemplateAndScroll('salon')">Try Demo</button>
+      </div>
+    </div>
+  </section>
+
   <script>
-    let speechEnabled = true;
     const chatWindow = document.getElementById('chat-window');
     let speechSynthesisUtterance = null;
+    let speechEnabled = true;
+    let currentTemplate = "general";
 
     function appendMessage(sender, text) {
       const msgContainer = document.createElement('div');
@@ -59,27 +112,27 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'avatar';
-      if (sender === 'user') {
-      avatar.src = '/static/IMG_2175.png';
-      } else {
-      const iconMap = {
-    college: '/static/icons/college.png',
-    clinic: '/static/icons/clinic.png',
-    hotel: '/static/icons/hotel.png',
-    ecommerce: '/static/icons/ecommerce.png',
-    salon: '/static/icons/salon.png',
-    consultant: '/static/icons/consultant.png',
-    fitness: '/static/icons/fitness.png',
-    real_estate: '/static/icons/real_estate.png',
-    therapist: '/static/icons/therapist.png'
-    };
-    const current = window.currentTemplate || "general";
-    avatar.src = iconMap[current] || '/static/lr-ai-logo.png';
-    }
 
+      if (sender === 'user') {
+        avatar.src = '/static/IMG_2175.png';
+      } else {
+        const iconMap = {
+          college: '/static/icons/college.png',
+          clinic: '/static/icons/clinic.png',
+          hotel: '/static/icons/hotel.png',
+          ecommerce: '/static/icons/ecommerce.png',
+          salon: '/static/icons/salon.png',
+          consultant: '/static/icons/consultant.png',
+          fitness: '/static/icons/fitness.png',
+          real_estate: '/static/icons/real_estate.png',
+          therapist: '/static/icons/therapist.png'
+        };
+        avatar.src = iconMap[currentTemplate] || '/static/lr-ai-logo.png';
+      }
 
       const bubble = document.createElement('div');
       bubble.className = 'bubble typing';
+
       msgContainer.appendChild(avatar);
       msgContainer.appendChild(bubble);
       chatWindow.appendChild(msgContainer);
@@ -102,126 +155,63 @@
       speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
       speechSynthesis.speak(speechSynthesisUtterance);
     }
-    
+
+    function sendMessage() {
+      stopSpeaking();
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage('user', message);
+      input.value = '';
+
+      const language = document.getElementById('language-select').value;
+
+      fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message, language, template: currentTemplate })
+      })
+      .then(res => res.json())
+      .then(data => appendMessage('bot', data.reply));
+    }
+
     function resetChat() {
       chatWindow.innerHTML = '';
     }
 
-    document.addEventListener("click", stopSpeaking);
-    document.getElementById("user-input").addEventListener("keydown", stopSpeaking);
-    document.getElementById("dark-mode-toggle").addEventListener("click", () => {<button id="tts-toggle" title="Toggle Voice">🔈</button>
-    document.getElementById("tts-toggle").addEventListener("click", () => {
-   speechEnabled = !speechEnabled;
-    document.getElementById("tts-toggle").textContent = speechEnabled ? "🔈" : "🔇";
-    });
+    function setTemplateAndScroll(template) {
+      currentTemplate = template;
+      document.getElementById("user-input").focus();
+      chatWindow.innerHTML = '';
+
+      const greetings = {
+        college: "Hi! I'm your college admissions assistant. How can I help you?",
+        clinic: "Hi! I'm your dental clinic assistant. How can I help you today?",
+        hotel: "Hello! I'm your hotel assistant. Need help with bookings?",
+        ecommerce: "Hi there! I'm your shopping assistant. What are you looking for?",
+        salon: "Hello! I'm your salon assistant. Ready for a makeover?",
+        consultant: "Hi! I'm your consulting assistant. How can I guide you?",
+        fitness: "Hey! I'm your gym assistant. Want to plan a workout?",
+        real_estate: "Hello! I'm your property assistant. Looking to buy or rent?",
+        therapist: "Hi! I'm your mental health assistant. How are you feeling today?"
+      };
+
+      appendMessage("bot", greetings[template] || "Hi! I'm your assistant. How can I help?");
+    }
+
+    document.getElementById("dark-mode-toggle").addEventListener("click", () => {
       document.body.classList.toggle("dark");
     });
-    // 1. Store selected chatbot template
-function setTemplateAndScroll(template) {
-  window.currentTemplate = template;
-  document.getElementById("user-input").focus();
-  document.getElementById("chat-window").innerHTML = '';
 
-  const greetings = {
-    college: "Hi! I'm your college admissions assistant. How can I help you?",
-    clinic: "Hi! I'm your dental clinic assistant. How can I help you today?",
-    hotel: "Hello! I'm your hotel assistant. Need help with bookings?",
-    ecommerce: "Hi there! I'm your shopping assistant. What are you looking for?",
-    salon: "Hello! I'm your salon assistant. Ready for a makeover?",
-    consultant: "Hi! I'm your consulting assistant. How can I guide you?",
-    fitness: "Hey! I'm your gym assistant. Want to plan a workout?",
-    real_estate: "Hello! I'm your property assistant. Looking to buy or rent?",
-    therapist: "Hi! I'm your mental health assistant. How are you feeling today?"
-  };
+    document.getElementById("tts-toggle").addEventListener("click", () => {
+      speechEnabled = !speechEnabled;
+      document.getElementById("tts-toggle").textContent = speechEnabled ? "🔈" : "🔇";
+    });
 
-  appendMessage("bot", greetings[template] || "Hi! I'm your assistant. How can I help?");
-}
-
-// 2. Add template to the message request
-function sendMessage() {
-  stopSpeaking();
-  const input = document.getElementById('user-input');
-  const message = input.value.trim();
-  if (!message) return;
-
-  appendMessage('user', message);
-  input.value = '';
-
-  const language = document.getElementById('language-select').value;
-  const template = window.currentTemplate || "general";
-
-  fetch('/chat', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ message, language, template })
-  })
-  .then(res => res.json())
-  .then(data => appendMessage('bot', data.reply));
-}
-
+    document.addEventListener("click", stopSpeaking);
+    document.getElementById("user-input").addEventListener("keydown", stopSpeaking);
   </script>
-<section class="industries-section">
-  <h2>Industries We Serve</h2>
-  <div class="industries-grid">
-
-    <div class="industry-card">
-      <h3>🎓 College Admissions</h3>
-      <p>Answers questions about fees, courses, scholarships & more.</p>
-      <button onclick="setTemplateAndScroll('college')">Try Demo</button>
-
-    </div>
-
-    <div class="industry-card">
-      <h3>🦷 Dental Clinics</h3>
-      <p>Books appointments, gives oral care tips, handles patient FAQs.</p>
-      <button onclick="setTemplateAndScroll('clinic')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>🛏️ Hotels & Resorts</h3>
-      <p>Helps guests check room availability, amenities, and booking.</p>
-      <button onclick="setTemplateAndScroll('hotel')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>🏋️ Gyms & Trainers</h3>
-      <p>Suggests workouts, books training slots, answers fitness queries.</p>
-      <button onclick="setTemplateAndScroll('fitness')">Try Demo</button>
-
-    </div>
-
-    <div class="industry-card">
-      <h3>💼 Consultants</h3>
-      <p>Qualifies leads, explains services, and collects client info.</p>
-      <button onclick="setTemplateAndScroll('consultant')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>🛒 Ecommerce</h3>
-      <p>Recommends products, tracks orders, answers shipping questions.</p>
-      <button onclick="setTemplateAndScroll('ecommerce')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>🧘 Therapists</h3>
-      <p>Guides users through check-ins, therapy types, and bookings.</p>
-      <button onclick="setTemplateAndScroll('therapist')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>🏠 Real Estate</h3>
-      <p>Shows listings by location, budget, or property type.</p>
-      <button onclick="setTemplateAndScroll('real_estate')">Try Demo</button>
-    </div>
-
-    <div class="industry-card">
-      <h3>✂️ Salons</h3>
-      <p>Books haircuts, suggests styles, answers pricing questions.</p>
-      <button onclick="setTemplateAndScroll('salon')">Try Demo</button>
-    </div>
-
-  </div>
-</section>
-
 </body>
 </html>
+
