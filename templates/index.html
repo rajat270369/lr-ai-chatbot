@@ -172,19 +172,20 @@
   speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
 
   const voiceMap = {
-    college: "en-US-Guy",           // male
-    clinic: "en-GB-George",         // male
-    hotel: "en-US-Christopher",     // male
-    ecommerce: "en-US-Davis",       // male
-    salon: "en-US-Jenny",           // ✅ female
-    consultant: "en-US-Brandon",    // male
-    fitness: "en-AU-Moira",         // female or neutral
-    real_estate: "en-IN-Neerja",    // neutral/female
-    therapist: "en-GB-Libby"        // ✅ female
+    college: "Microsoft David - English (United States)",
+    clinic: "Microsoft Mark - English (United States)",
+    hotel: "Microsoft Guy Online (Natural) - English (United States)",
+    ecommerce: "Microsoft David - English (United States)",
+    salon: "Microsoft Zira - English (United States)", // ✅ Female
+    consultant: "Microsoft Mark - English (United States)",
+    fitness: "Microsoft Hayley Online - English (Australia)",
+    real_estate: "Microsoft Libby Online (Natural) - English (United Kingdom)", // ✅ Female
+    therapist: "Microsoft Libby Online (Natural) - English (United Kingdom)"    // ✅ Female
   };
 
   const preferred = voiceMap[currentTemplate] || "";
-  const matchedVoice = speechSynthesis.getVoices().find(v => v.name.includes(preferred));
+  const voices = speechSynthesis.getVoices();
+  const matchedVoice = voices.find(v => v.name === preferred);
 
   if (matchedVoice) {
     speechSynthesisUtterance.voice = matchedVoice;
