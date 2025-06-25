@@ -58,8 +58,10 @@ payload = {
             "role": "user",
             "content": user_input
         }
-    ]
-}
+      ]
+    }
+
+
     try:
         response = requests.post(GROQ_API_URL, headers=headers, json=payload)
         response.raise_for_status()
