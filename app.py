@@ -17,7 +17,7 @@ def home():
 def admin():
     if request.method == 'POST':
         password = request.form.get('password')
-        if password == "admin123":
+        if password == "12Ra442Ra1":
             return redirect('/dashboard')
         return "Access denied"
     return render_template('admin_login.html')
