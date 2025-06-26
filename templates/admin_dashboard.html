@@ -36,7 +36,32 @@
     {% endmacro %}
 
     {{ render_section('Hotel Bookings', ['id', 'guest_name', 'room_type', 'check_in', 'check_out'], hotel, 'hotel') }}
-    {{ render_section('Ecommerce Orders', ['id', 'product', 'status', 'eta'], ecommerce, 'ecommerce') }}
+    <h2>Ecommerce Orders</h2>
+<form method="POST" action="/add/ecommerce" class="row g-2 mb-3">
+  <input name="id" placeholder="ID" class="form-control col" required>
+  <input name="product" placeholder="Product" class="form-control col" required>
+  <input name="status" placeholder="Status" class="form-control col" required>
+  <input name="eta" placeholder="ETA" class="form-control col" required>
+  <button class="btn btn-primary col-2">Add</button>
+</form>
+
+<table class="table table-bordered">
+  <thead class="table-light">
+    <tr><th>ID</th><th>Product</th><th>Status</th><th>ETA</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+    {% for row in ecommerce %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</td>
+        <td>{{ row[3] }}</td>
+        <td><a href="/delete/ecommerce/{{ row[0] }}" class="btn btn-danger btn-sm">Delete</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
     {{ render_section('College Admissions', ['id', 'name', 'course', 'status'], college, 'college') }}
     {{ render_section('Dental Appointments', ['id', 'patient_name', 'doctor', 'time'], clinic, 'clinic') }}
     {{ render_section('Gym Memberships', ['id', 'member_name', 'plan', 'expires'], fitness, 'fitness') }}
