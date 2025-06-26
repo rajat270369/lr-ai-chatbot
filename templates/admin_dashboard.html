@@ -98,7 +98,16 @@
     {{ render_table(college, ['id', 'name', 'course', 'status'], 'college') }}
 
     <!-- 🦷 Dental Appointments -->
-    {{ render_section('Dental Appointments', ['id', 'patient_name', 'doctor', 'time'], clinic, 'clinic') }}
+    <h2>Dental Appointments</h2>
+<form method="POST" action="/add/clinic" class="row g-2 mb-3">
+  <input name="id" placeholder="ID" class="form-control col" required>
+  <input name="patient_name" placeholder="Patient Name" class="form-control col" required>
+  <input name="doctor" placeholder="Doctor" class="form-control col" required>
+  <input name="time" placeholder="Time" class="form-control col" required>
+  <button class="btn btn-primary col-2">Add</button>
+</form>
+{{ render_table(clinic, ['id', 'patient_name', 'doctor', 'time'], 'clinic') }}
+
 
     <!-- 🏋️ Gym Memberships -->
     <h2>Gym Memberships</h2>
@@ -117,7 +126,27 @@
     {{ render_table(fitness, ['id', 'member_name', 'plan', 'expires'], 'fitness') }}
 
     <!-- 🏠 Real Estate -->
-    {{ render_section('Real Estate Properties', ['id', 'location', 'type', 'status'], real_estate, 'real_estate') }}
+    <h2>Real Estate Properties</h2>
+<form method="POST" action="/add/real_estate" class="row g-2 mb-3">
+  <input name="id" placeholder="ID" class="form-control col" required>
+  <input name="location" placeholder="Location" class="form-control col" required>
+  <select name="type" class="form-control col" required>
+    <option disabled selected>Type</option>
+    <option>Apartment</option>
+    <option>Villa</option>
+    <option>Plot</option>
+    <option>Commercial</option>
+  </select>
+  <select name="status" class="form-control col" required>
+    <option disabled selected>Status</option>
+    <option>Available</option>
+    <option>Booked</option>
+    <option>Sold</option>
+  </select>
+  <button class="btn btn-primary col-2">Add</button>
+</form>
+{{ render_table(real_estate, ['id', 'location', 'type', 'status'], 'real_estate') }}
+
 
     <!-- ✂️ Salon Appointments -->
     <h2>Salon Appointments</h2>
@@ -130,6 +159,7 @@
         <option>Styling</option>
         <option>Coloring</option>
         <option>Facial</option>
+        <option>Manicure</option>
       </select>
       <input name="time" placeholder="Time" class="form-control col" required>
       <button class="btn btn-primary col-2">Add</button>
