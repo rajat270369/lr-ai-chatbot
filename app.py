@@ -1,77 +1,165 @@
-from flask import Flask, render_template, request, jsonify
-import os, requests, re
+import os
+import re
+import sqlite3
+import requests
+from flask import Flask, render_template, request, jsonify, redirect, session, url_for
 
 app = Flask(__name__)
+app.secret_key = "your_strong_secret_here"  # Used for session-based login
+
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Dummy data per industry
-COLLEGE_ADMISSIONS = {
-    "101": "Admission ID 101: B.Tech in CS, Status: Confirmed.",
-    "102": "Admission ID 102: BA in Psychology, Status: Pending Docs."
-}
+# ----------------------------
+# DATABASE INIT FUNCTION
+# ----------------------------
+def init_db():
+    conn = sqlite3.connect('db.sqlite3')
+    c = conn.cursor()
 
-DENTAL_APPOINTMENTS = {
-    "201": "Appointment ID 201: Dr. Sharma, July 2nd, 11:00 AM.",
-    "202": "Appointment ID 202: Cleaning with Dr. Patel, July 3rd, 2:30 PM."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS hotel_bookings (
+            id TEXT PRIMARY KEY,
+            guest_name TEXT,
+            room_type TEXT,
+            check_in TEXT,
+            check_out TEXT
+        )
+    ''')
 
-HOTEL_BOOKINGS = {
-    "301": "Booking ID 301: Deluxe Room, Check-in: June 28, Check-out: July 1.",
-    "302": "Booking ID 302: Suite Room, Check-in: July 5, 2 nights."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS ecommerce_orders (
+            id TEXT PRIMARY KEY,
+            product TEXT,
+            status TEXT,
+            eta TEXT
+        )
+    ''')
 
-GYM_MEMBERSHIPS = {
-    "401": "Membership ID 401: Valid until August 15, 2025.",
-    "402": "Membership ID 402: Expired on May 30, 2025."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS college_admissions (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            course TEXT,
+            status TEXT
+        )
+    ''')
 
-ECOM_ORDERS = {
-    "501": "Order #501: Shoes - Shipped, ETA June 30.",
-    "502": "Order #502: T-shirt - Delivered on June 24."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS dental_appointments (
+            id TEXT PRIMARY KEY,
+            patient_name TEXT,
+            doctor TEXT,
+            time TEXT
+        )
+    ''')
 
-REAL_ESTATE = {
-    "601": "Property ID 601: 2BHK Flat in Gurgaon, Status: Available.",
-    "602": "Property ID 602: Studio in Mumbai, Status: Booked."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS gym_memberships (
+            id TEXT PRIMARY KEY,
+            member_name TEXT,
+            plan TEXT,
+            expires TEXT
+        )
+    ''')
 
-SALON_APPOINTMENTS = {
-    "701": "Salon ID 701: Haircut with Anya, July 1 at 4 PM.",
-    "702": "Salon ID 702: Facial with Meera, June 30 at 11 AM."
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS real_estate_properties (
+            id TEXT PRIMARY KEY,
+            location TEXT,
+            type TEXT,
+            status TEXT
+        )
+    ''')
 
-TEMPLATE_LOOKUP = {
-    "college": COLLEGE_ADMISSIONS,
-    "clinic": DENTAL_APPOINTMENTS,
-    "hotel": HOTEL_BOOKINGS,
-    "fitness": GYM_MEMBERSHIPS,
-    "ecommerce": ECOM_ORDERS,
-    "real_estate": REAL_ESTATE,
-    "salon": SALON_APPOINTMENTS
-}
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS salon_appointments (
+            id TEXT PRIMARY KEY,
+            client_name TEXT,
+            service TEXT,
+            time TEXT
+        )
+    ''')
 
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# ----------------------------
+# HOME ROUTE
+# ----------------------------
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# ----------------------------
+# CHAT ROUTE
+# ----------------------------
 @app.route('/chat', methods=['POST'])
 def chat():
     user_input = request.json.get('message', '')
     language = request.json.get('language', 'en')
     template = request.json.get('template', 'general')
 
-    # Detect numeric IDs and respond from data
     match = re.search(r'\b\d{3}\b', user_input)
-    if template in TEMPLATE_LOOKUP and match:
+    if match:
         id_key = match.group()
-        data = TEMPLATE_LOOKUP[template]
-        if id_key in data:
-            return jsonify({'reply': data[id_key]})
-        else:
-            return jsonify({'reply': f"Sorry, I couldn’t find any info for ID #{id_key}."})
+        conn = sqlite3.connect('db.sqlite3')
+        c = conn.cursor()
+        result = None
+        reply = None
 
-    # Otherwise forward to Groq
+        if template == "hotel":
+            c.execute("SELECT * FROM hotel_bookings WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Booking ID {id_key}: {result[1]} booked a {result[2]} from {result[3]} to {result[4]}."
+
+        elif template == "ecommerce":
+            c.execute("SELECT * FROM ecommerce_orders WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Order {id_key}: {result[1]} - Status: {result[2]}, ETA: {result[3]}."
+
+        elif template == "college":
+            c.execute("SELECT * FROM college_admissions WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Admission ID {id_key}: {result[1]}, Course: {result[2]}, Status: {result[3]}."
+
+        elif template == "clinic":
+            c.execute("SELECT * FROM dental_appointments WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Appointment ID {id_key}: {result[1]} with {result[2]} at {result[3]}."
+
+        elif template == "fitness":
+            c.execute("SELECT * FROM gym_memberships WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Membership ID {id_key}: {result[1]}, Plan: {result[2]}, Expires: {result[3]}."
+
+        elif template == "real_estate":
+            c.execute("SELECT * FROM real_estate_properties WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Property ID {id_key}: {result[1]}, Type: {result[2]}, Status: {result[3]}."
+
+        elif template == "salon":
+            c.execute("SELECT * FROM salon_appointments WHERE id = ?", (id_key,))
+            result = c.fetchone()
+            if result:
+                reply = f"Appointment ID {id_key}: {result[1]}, Service: {result[2]}, Time: {result[3]}."
+
+        conn.close()
+
+        if reply:
+            return jsonify({'reply': reply})
+        else:
+            return jsonify({'reply': f"Sorry, I couldn't find any record for ID {id_key}."})
+
+    # Fallback to LLaMA if no local match
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
@@ -85,7 +173,8 @@ def chat():
                 "role": "system",
                 "content": (
                     "You are LR.AI, a helpful assistant for small businesses. "
-                    "Use clean formatting, bullet points, and speak in the user's selected language: " + language
+                    "Ask the user for an ID (like booking or order ID) if the question implies a specific lookup. "
+                    "Use bullet points and be concise. Reply in the user's language: " + language
                 )
             },
             {"role": "user", "content": user_input}
@@ -100,6 +189,41 @@ def chat():
     except requests.exceptions.RequestException as e:
         return jsonify({'reply': f"Error: {str(e)}"})
 
+# ----------------------------
+# ADMIN LOGIN
+# ----------------------------
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == "admin123":
+            session['admin'] = True
+            return redirect(url_for('dashboard'))
+        return "Incorrect password", 403
+    return render_template('admin_login.html')
+
+# ----------------------------
+# ADMIN DASHBOARD
+# ----------------------------
+@app.route('/dashboard')
+def dashboard():
+    if not session.get('admin'):
+        return redirect(url_for('admin'))
+
+    conn = sqlite3.connect('db.sqlite3')
+    c = conn.cursor()
+
+    c.execute('SELECT * FROM hotel_bookings')
+    hotel = c.fetchall()
+
+    c.execute('SELECT * FROM ecommerce_orders')
+    ecommerce = c.fetchall()
+
+    conn.close()
+
+    return render_template('admin_dashboard.html', hotel=hotel, ecommerce=ecommerce)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
+
 
