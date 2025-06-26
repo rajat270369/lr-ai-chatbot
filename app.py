@@ -168,31 +168,39 @@ def add_entry(category):
     form = request.form
 
     try:
-        tables = {
-            'hotel': ("INSERT OR REPLACE INTO hotel_bookings VALUES (?, ?, ?, ?, ?)",
-                      (form['id'], form['guest_name'], form['room_type'], form['check_in'], form['check_out'])),
-            'ecommerce': ("INSERT OR REPLACE INTO ecommerce_orders VALUES (?, ?, ?, ?)",
-                          (form['id'], form['product'], form['status'], form['eta'])),
-            'college': ("INSERT OR REPLACE INTO college_admissions VALUES (?, ?, ?, ?)",
-                        (form['id'], form['name'], form['course'], form['status'])),
-            'clinic': ("INSERT OR REPLACE INTO dental_appointments VALUES (?, ?, ?, ?)",
-                       (form['id'], form['patient_name'], form['doctor'], form['time'])),
-            'fitness': ("INSERT OR REPLACE INTO gym_memberships VALUES (?, ?, ?, ?)",
-                        (form['id'], form['member_name'], form['plan'], form['expires'])),
-            'real_estate': ("INSERT OR REPLACE INTO real_estate_properties VALUES (?, ?, ?, ?)",
-                            (form['id'], form['location'], form['type'], form['status'])),
-            'salon': ("INSERT OR REPLACE INTO salon_appointments VALUES (?, ?, ?, ?)",
-                      (form['id'], form['client_name'], form['service'], form['time']))
-        }
+        if category == 'hotel':
+            c.execute("INSERT OR REPLACE INTO hotel_bookings VALUES (?, ?, ?, ?, ?)", (
+                form['id'], form['guest_name'], form['room_type'], form['check_in'], form['check_out']
+            ))
+        elif category == 'ecommerce':
+            c.execute("INSERT OR REPLACE INTO ecommerce_orders VALUES (?, ?, ?, ?)", (
+                form['id'], form['product'], form['status'], form['eta']
+            ))
+        elif category == 'college':
+            c.execute("INSERT OR REPLACE INTO college_admissions VALUES (?, ?, ?, ?)", (
+                form['id'], form['name'], form['course'], form['status']
+            ))
+        elif category == 'clinic':
+            c.execute("INSERT OR REPLACE INTO dental_appointments VALUES (?, ?, ?, ?)", (
+                form['id'], form['patient_name'], form['doctor'], form['time']
+            ))
+        elif category == 'fitness':
+            c.execute("INSERT OR REPLACE INTO gym_memberships VALUES (?, ?, ?, ?)", (
+                form['id'], form['member_name'], form['plan'], form['expires']
+            ))
+        elif category == 'real_estate':
+            c.execute("INSERT OR REPLACE INTO real_estate_properties VALUES (?, ?, ?, ?)", (
+                form['id'], form['location'], form['type'], form['status']
+            ))
+        elif category == 'salon':
+            c.execute("INSERT OR REPLACE INTO salon_appointments VALUES (?, ?, ?, ?)", (
+                form['id'], form['client_name'], form['service'], form['time']
+            ))
 
-        if category in tables:
-            query, data = tables[category]
-            c.execute(query, data)
-            conn.commit()
-
+        conn.commit()
     except KeyError as e:
         conn.close()
-        return f"Missing field in form: {e}", 400
+        return f"Missing field: {e}", 400
 
     conn.close()
     return redirect(url_for('dashboard'))
