@@ -9,66 +9,135 @@
   <div class="container py-5">
     <h1 class="mb-4">Admin Dashboard</h1>
 
-    {% macro render_section(title, fields, rows, category) %}
-      <h2>{{ title }}</h2>
-      <form method="POST" action="/add/{{ category }}" class="row g-2 mb-3">
-        {% for field in fields %}
-          <input name="{{ field }}" placeholder="{{ field.replace('_', ' ').title() }}" class="form-control col" required>
-        {% endfor %}
-        <button class="btn btn-primary col-2">Add</button>
-      </form>
-      <table class="table table-bordered">
-        <thead class="table-light">
+    <!-- 🏨 Hotel Bookings -->
+    <h2>Hotel Bookings</h2>
+    <form method="POST" action="/add/hotel" class="row g-2 mb-3">
+      <input name="id" placeholder="ID" class="form-control col" required>
+      <input name="guest_name" placeholder="Guest Name" class="form-control col" required>
+      <select name="room_type" class="form-control col" required>
+        <option disabled selected>Room Type</option>
+        <option>Single</option>
+        <option>Double</option>
+        <option>Suite</option>
+        <option>Deluxe</option>
+      </select>
+      <select name="check_in" class="form-control col" required>
+        <option disabled selected>Check-in Time</option>
+        <option>12:00 PM</option>
+        <option>2:00 PM</option>
+        <option>4:00 PM</option>
+      </select>
+      <select name="check_out" class="form-control col" required>
+        <option disabled selected>Check-out Time</option>
+        <option>10:00 AM</option>
+        <option>12:00 PM</option>
+        <option>2:00 PM</option>
+      </select>
+      <button class="btn btn-primary col-2">Add</button>
+    </form>
+    <!-- Render hotel table -->
+    {% macro render_table(rows, fields, category) %}
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          {% for field in fields %}<th>{{ field.replace('_', ' ').title() }}</th>{% endfor %}
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
           <tr>
-            {% for field in fields %}<th>{{ field.replace('_', ' ').title() }}</th>{% endfor %}
-            <th>Action</th>
+            {% for value in row %}<td>{{ value }}</td>{% endfor %}
+            <td><a href="/delete/{{ category }}/{{ row[0] }}" class="btn btn-danger btn-sm">Delete</a></td>
           </tr>
-        </thead>
-        <tbody>
-          {% for row in rows %}
-            <tr>
-              {% for value in row %}<td>{{ value }}</td>{% endfor %}
-              <td><a href="/delete/{{ category }}/{{ row[0] }}" class="btn btn-danger btn-sm">Delete</a></td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        {% endfor %}
+      </tbody>
+    </table>
     {% endmacro %}
+    {{ render_table(hotel, ['id', 'guest_name', 'room_type', 'check_in', 'check_out'], 'hotel') }}
 
-    {{ render_section('Hotel Bookings', ['id', 'guest_name', 'room_type', 'check_in', 'check_out'], hotel, 'hotel') }}
+    <!-- 🛒 Ecommerce Orders -->
     <h2>Ecommerce Orders</h2>
-<form method="POST" action="/add/ecommerce" class="row g-2 mb-3">
-  <input name="id" placeholder="ID" class="form-control col" required>
-  <input name="product" placeholder="Product" class="form-control col" required>
-  <input name="status" placeholder="Status" class="form-control col" required>
-  <input name="eta" placeholder="ETA" class="form-control col" required>
-  <button class="btn btn-primary col-2">Add</button>
-</form>
+    <form method="POST" action="/add/ecommerce" class="row g-2 mb-3">
+      <input name="id" placeholder="ID" class="form-control col" required>
+      <input name="product" placeholder="Product" class="form-control col" required>
+      <select name="status" class="form-control col" required>
+        <option disabled selected>Status</option>
+        <option>Processing</option>
+        <option>Shipped</option>
+        <option>Delivered</option>
+        <option>Cancelled</option>
+      </select>
+      <select name="eta" class="form-control col" required>
+        <option disabled selected>ETA</option>
+        <option>1 Day</option>
+        <option>2 Days</option>
+        <option>3 Days</option>
+        <option>1 Week</option>
+      </select>
+      <button class="btn btn-primary col-2">Add</button>
+    </form>
+    {{ render_table(ecommerce, ['id', 'product', 'status', 'eta'], 'ecommerce') }}
 
-<table class="table table-bordered">
-  <thead class="table-light">
-    <tr><th>ID</th><th>Product</th><th>Status</th><th>ETA</th><th>Action</th></tr>
-  </thead>
-  <tbody>
-    {% for row in ecommerce %}
-      <tr>
-        <td>{{ row[0] }}</td>
-        <td>{{ row[1] }}</td>
-        <td>{{ row[2] }}</td>
-        <td>{{ row[3] }}</td>
-        <td><a href="/delete/ecommerce/{{ row[0] }}" class="btn btn-danger btn-sm">Delete</a></td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    <!-- 🎓 College Admissions -->
+    <h2>College Admissions</h2>
+    <form method="POST" action="/add/college" class="row g-2 mb-3">
+      <input name="id" placeholder="ID" class="form-control col" required>
+      <input name="name" placeholder="Name" class="form-control col" required>
+      <select name="course" class="form-control col" required>
+        <option disabled selected>Course</option>
+        <option>B.Sc</option>
+        <option>B.A.</option>
+        <option>B.Com</option>
+        <option>B.Tech</option>
+        <option>M.Sc</option>
+      </select>
+      <input name="status" placeholder="Status" class="form-control col" required>
+      <button class="btn btn-primary col-2">Add</button>
+    </form>
+    {{ render_table(college, ['id', 'name', 'course', 'status'], 'college') }}
 
-    {{ render_section('College Admissions', ['id', 'name', 'course', 'status'], college, 'college') }}
+    <!-- 🦷 Dental Appointments -->
     {{ render_section('Dental Appointments', ['id', 'patient_name', 'doctor', 'time'], clinic, 'clinic') }}
-    {{ render_section('Gym Memberships', ['id', 'member_name', 'plan', 'expires'], fitness, 'fitness') }}
+
+    <!-- 🏋️ Gym Memberships -->
+    <h2>Gym Memberships</h2>
+    <form method="POST" action="/add/fitness" class="row g-2 mb-3">
+      <input name="id" placeholder="ID" class="form-control col" required>
+      <input name="member_name" placeholder="Member Name" class="form-control col" required>
+      <select name="plan" class="form-control col" required>
+        <option disabled selected>Plan</option>
+        <option>Monthly</option>
+        <option>Quarterly</option>
+        <option>Yearly</option>
+      </select>
+      <input name="expires" placeholder="Expires On" class="form-control col" required>
+      <button class="btn btn-primary col-2">Add</button>
+    </form>
+    {{ render_table(fitness, ['id', 'member_name', 'plan', 'expires'], 'fitness') }}
+
+    <!-- 🏠 Real Estate -->
     {{ render_section('Real Estate Properties', ['id', 'location', 'type', 'status'], real_estate, 'real_estate') }}
-    {{ render_section('Salon Appointments', ['id', 'client_name', 'service', 'time'], salon, 'salon') }}
+
+    <!-- ✂️ Salon Appointments -->
+    <h2>Salon Appointments</h2>
+    <form method="POST" action="/add/salon" class="row g-2 mb-3">
+      <input name="id" placeholder="ID" class="form-control col" required>
+      <input name="client_name" placeholder="Client Name" class="form-control col" required>
+      <select name="service" class="form-control col" required>
+        <option disabled selected>Service</option>
+        <option>Haircut</option>
+        <option>Styling</option>
+        <option>Coloring</option>
+        <option>Facial</option>
+      </select>
+      <input name="time" placeholder="Time" class="form-control col" required>
+      <button class="btn btn-primary col-2">Add</button>
+    </form>
+    {{ render_table(salon, ['id', 'client_name', 'service', 'time'], 'salon') }}
 
   </div>
 </body>
 </html>
+
 
