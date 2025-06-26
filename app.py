@@ -166,28 +166,37 @@ def add_entry(category):
     conn = sqlite3.connect('db.sqlite3')
     c = conn.cursor()
     form = request.form
-    tables = {
-        'hotel': ("INSERT OR REPLACE INTO hotel_bookings VALUES (?, ?, ?, ?, ?)",
-                  (form['id'], form['guest_name'], form['room_type'], form['check_in'], form['check_out'])),
-        'ecommerce': ("INSERT OR REPLACE INTO ecommerce_orders VALUES (?, ?, ?, ?)",
-                      (form['id'], form['product'], form['status'], form['eta'])),
-        'college': ("INSERT OR REPLACE INTO college_admissions VALUES (?, ?, ?, ?)",
-                    (form['id'], form['name'], form['course'], form['status'])),
-        'clinic': ("INSERT OR REPLACE INTO dental_appointments VALUES (?, ?, ?, ?)",
-                   (form['id'], form['patient_name'], form['doctor'], form['time'])),
-        'fitness': ("INSERT OR REPLACE INTO gym_memberships VALUES (?, ?, ?, ?)",
-                    (form['id'], form['member_name'], form['plan'], form['expires'])),
-        'real_estate': ("INSERT OR REPLACE INTO real_estate_properties VALUES (?, ?, ?, ?)",
-                        (form['id'], form['location'], form['type'], form['status'])),
-        'salon': ("INSERT OR REPLACE INTO salon_appointments VALUES (?, ?, ?, ?)",
-                  (form['id'], form['client_name'], form['service'], form['time']))
-    }
-    if category in tables:
-        query, data = tables[category]
-        c.execute(query, data)
-        conn.commit()
+
+    try:
+        tables = {
+            'hotel': ("INSERT OR REPLACE INTO hotel_bookings VALUES (?, ?, ?, ?, ?)",
+                      (form['id'], form['guest_name'], form['room_type'], form['check_in'], form['check_out'])),
+            'ecommerce': ("INSERT OR REPLACE INTO ecommerce_orders VALUES (?, ?, ?, ?)",
+                          (form['id'], form['product'], form['status'], form['eta'])),
+            'college': ("INSERT OR REPLACE INTO college_admissions VALUES (?, ?, ?, ?)",
+                        (form['id'], form['name'], form['course'], form['status'])),
+            'clinic': ("INSERT OR REPLACE INTO dental_appointments VALUES (?, ?, ?, ?)",
+                       (form['id'], form['patient_name'], form['doctor'], form['time'])),
+            'fitness': ("INSERT OR REPLACE INTO gym_memberships VALUES (?, ?, ?, ?)",
+                        (form['id'], form['member_name'], form['plan'], form['expires'])),
+            'real_estate': ("INSERT OR REPLACE INTO real_estate_properties VALUES (?, ?, ?, ?)",
+                            (form['id'], form['location'], form['type'], form['status'])),
+            'salon': ("INSERT OR REPLACE INTO salon_appointments VALUES (?, ?, ?, ?)",
+                      (form['id'], form['client_name'], form['service'], form['time']))
+        }
+
+        if category in tables:
+            query, data = tables[category]
+            c.execute(query, data)
+            conn.commit()
+
+    except KeyError as e:
+        conn.close()
+        return f"Missing field in form: {e}", 400
+
     conn.close()
     return redirect(url_for('dashboard'))
+
 
 @app.route('/delete/<category>/<id>', methods=['GET'])
 def delete_entry(category, id):
