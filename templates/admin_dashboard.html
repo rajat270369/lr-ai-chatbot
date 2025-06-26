@@ -21,11 +21,15 @@
         <thead class="table-light">
           <tr>
             {% for field in fields %}<th>{{ field.replace('_', ' ').title() }}</th>{% endfor %}
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
-            <tr>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>
+            <tr>
+              {% for value in row %}<td>{{ value }}</td>{% endfor %}
+              <td><a href="/delete/{{ category }}/{{ row[0] }}" class="btn btn-danger btn-sm">Delete</a></td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -42,3 +46,4 @@
   </div>
 </body>
 </html>
+

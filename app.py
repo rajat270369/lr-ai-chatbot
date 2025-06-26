@@ -189,7 +189,27 @@ def add_entry(category):
     conn.close()
     return redirect(url_for('dashboard'))
 
+@app.route('/delete/<category>/<id>', methods=['GET'])
+def delete_entry(category, id):
+    table_map = {
+        'hotel': 'hotel_bookings',
+        'ecommerce': 'ecommerce_orders',
+        'college': 'college_admissions',
+        'clinic': 'dental_appointments',
+        'fitness': 'gym_memberships',
+        'real_estate': 'real_estate_properties',
+        'salon': 'salon_appointments'
+    }
+    if category in table_map:
+        conn = sqlite3.connect('db.sqlite3')
+        c = conn.cursor()
+        c.execute(f"DELETE FROM {table_map[category]} WHERE id = ?", (id,))
+        conn.commit()
+        conn.close()
+    return redirect(url_for('dashboard'))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
+
 
 
