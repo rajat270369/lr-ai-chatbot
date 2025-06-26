@@ -73,6 +73,29 @@ def add_entry(category):
     conn.close()
     return redirect(url_for('dashboard'))
 
+def initialize_tables():
+    conn = sqlite3.connect('db.sqlite3')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS hotel_bookings (
+        id TEXT PRIMARY KEY, guest_name TEXT, room_type TEXT, check_in TEXT, check_out TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS ecommerce_orders (
+        id TEXT PRIMARY KEY, product TEXT, status TEXT, eta TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS college_admissions (
+        id TEXT PRIMARY KEY, name TEXT, course TEXT, status TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS dental_appointments (
+        id TEXT PRIMARY KEY, patient_name TEXT, doctor TEXT, time TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS gym_memberships (
+        id TEXT PRIMARY KEY, member_name TEXT, plan TEXT, expires TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS real_estate_properties (
+        id TEXT PRIMARY KEY, location TEXT, type TEXT, status TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS salon_appointments (
+        id TEXT PRIMARY KEY, client_name TEXT, service TEXT, time TEXT)''')
+    conn.commit()
+    conn.close()
+
+initialize_tables()
+
+
 @app.route('/delete/<category>/<int:entry_id>')
 def delete_entry(category, entry_id):
     conn = sqlite3.connect('db.sqlite3')
