@@ -123,7 +123,11 @@ def chat():
     template = request.json.get('template', 'general')
     user_id = "default_user"
 
-    # Initialize memory
+    # Ensure API key present
+    if not GROQ_API_KEY:
+        return jsonify({'reply': "Server configuration error: GROQ_API_KEY is not set."}), 500
+
+    # Initialize memory (unchanged)
     if user_id not in session_memory:
         session_memory[user_id] = [{
             "role": "system",
@@ -134,7 +138,6 @@ def chat():
             )
         }]
 
-    # Add user message to memory
     session_memory[user_id].append({"role": "user", "content": user_input})
 
     headers = {
@@ -142,23 +145,35 @@ def chat():
         "Content-Type": "application/json"
     }
 
+    # Use the groq/ model id (matches Groq examples)
     payload = {
-        "model": "llama3-70b-8192",
+        "model": "groq/llama3-70b-8192",
         "max_tokens": 500,
         "messages": session_memory[user_id]
     }
 
     try:
         response = requests.post(GROQ_API_URL, headers=headers, json=payload)
-        response.raise_for_status()
-        reply = response.json()['choices'][0]['message']['content']
+        # capture body for debugging even if non-200
+        body_text = response.text
+        # If not OK, return server message so you can see validation details
+        if response.status_code != 200:
+            # Try to parse JSON error
+            try:
+                err_json = response.json()
+            except Exception:
+                err_json = {"raw": body_text}
+            # Return the provider error (useful during debugging)
+            return jsonify({'reply': f"API error {response.status_code}", 'details': err_json}), response.status_code
 
-        # Add bot reply to memory
+        data = response.json()
+        reply = data['choices'][0]['message']['content']
         session_memory[user_id].append({"role": "assistant", "content": reply})
-
         return jsonify({'reply': reply})
+
     except requests.exceptions.RequestException as e:
-        return jsonify({'reply': f"Error: {str(e)}"})
+        # network-level error
+        return jsonify({'reply': f"Network error: {str(e)}"}), 502
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
