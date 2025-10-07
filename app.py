@@ -22,13 +22,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # In-memory per-user conversation memory (simple)
-session_memory = {}
+session_memory = {}                                                     
 MAX_MEMORY = int(os.environ.get("MAX_SESSION_MEMORY", 40))
 
 # Groq/OpenAI-compatible API config (use env vars)
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 GROQ_API_URL = os.environ.get("GROQ_API_URL", "https://api.groq.com/openai/v1/chat/completions")
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "groq/llama3-70b-8192")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "groq/llama-3.1-8b-instant")
 MAX_TOKENS = int(os.environ.get("MAX_TOKENS", 500))
 TEMPERATURE = float(os.environ.get("TEMPERATURE", 0.0))
 
